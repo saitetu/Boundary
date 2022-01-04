@@ -19,22 +19,23 @@ import com.saitetu.boundary.data.*
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val geoViewModel: GeoViewModel = GeoViewModel()
+        val geoViewModel = GeoViewModel()
+        geoViewModel.load("140", "40")
         setContent {
             HelloScreen(geoViewModel.geo)
         }
     }
 
     @Composable
-    fun HelloScreen(geoLiveData:LiveData<GeoResponse>) {
+    fun HelloScreen(geoLiveData: LiveData<GeoResponse>) {
         val geo by geoLiveData.observeAsState(GeoResponse(Response(emptyList())))
-        if (geo.response.location.isNotEmpty()){
+        if (geo.response.location.isNotEmpty()) {
             Loaded(city = geo.response.location[0].city)
         }
     }
 
     @Composable
-    fun Loaded(city:String){
+    fun Loaded(city: String) {
         setContent {
             Column(
                 Modifier.fillMaxSize(),

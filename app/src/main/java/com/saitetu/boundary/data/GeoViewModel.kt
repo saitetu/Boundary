@@ -11,13 +11,9 @@ class GeoViewModel : ViewModel() {
     var geo: MutableLiveData<GeoResponse> = MutableLiveData<GeoResponse>()
     private val repository = GeoRepository()
 
-    init {
-        load()
-    }
-
-    fun load() {
+    fun load(x:String,y:String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getLocations("135", "35")?.let {
+            repository.getLocations(x, y)?.let {
                 geo.postValue(it)
             }
         }
