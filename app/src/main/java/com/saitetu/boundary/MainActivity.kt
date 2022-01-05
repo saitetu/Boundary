@@ -1,6 +1,10 @@
 package com.saitetu.boundary
 
 import android.Manifest.permission.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -17,6 +21,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import com.saitetu.boundary.data.GeoResponse
 import com.saitetu.boundary.data.GeoViewModel
 import com.saitetu.boundary.data.Response
@@ -25,8 +30,9 @@ import com.saitetu.boundary.data.Response
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val geoViewModel = GeoViewModel()
+        val geoViewModel = ViewModelProvider.NewInstanceFactory().create(GeoViewModel::class.java)
         geoViewModel.load("140", "40")
+        createNotificationChannel()
         setContent {
             Column(
                 Modifier.fillMaxSize(),
@@ -50,6 +56,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                GpsService.CHANNEL_ID,
+                "お知らせ",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "お知らせを通知します。"
+            }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     @Composable
     fun StartButton() {
         Button(onClick = {
@@ -61,8 +82,22 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
+            val intent = Intent(this, GpsService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
         }) {
             Text(text = "Start")
+        }
+    }
+
+    @Composable
+    fun EndButton() {
+        Button(onClick = {
+            val intent = Intent(this, GpsService::class.java)
+            stopService(intent)
+        }) {
+            Text("End")
         }
     }
 
