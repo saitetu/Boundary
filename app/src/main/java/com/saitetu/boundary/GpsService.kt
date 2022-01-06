@@ -21,11 +21,15 @@ class GpsService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-    private val repository = GeoRepository()
+    private val repository = GeoRepository(this)
 
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+    }
+
+    private fun locationRequest() {
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

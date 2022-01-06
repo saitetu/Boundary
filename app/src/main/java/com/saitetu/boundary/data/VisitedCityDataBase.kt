@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.saitetu.boundary.domain.dao.VisitedCityDao
 import com.saitetu.boundary.domain.entity.VisitedCity
 
-@Database(entities = [VisitedCity::class], version = 1)
+@Database(entities = [VisitedCity::class], version = 1, exportSchema = false)
 abstract class VisitedCityDataBase : RoomDatabase() {
 
     abstract fun visitedCityDao(): VisitedCityDao

@@ -14,23 +14,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
-import com.saitetu.boundary.data.GeoResponse
-import com.saitetu.boundary.data.Response
+import com.saitetu.boundary.data.*
 import com.saitetu.boundary.viewmodel.GeoViewModel
 
 
 class MainActivity : AppCompatActivity() {
+    //    val geoViewModel = ViewModelProvider.NewInstanceFactory().create(GeoViewModel::class.java)
+    private val geoViewModel by lazy {
+        GeoViewModel(
+            GeoRepository(this),
+            VisitedCityRepository(VisitedCityDataBase.getInstance(this).visitedCityDao())
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val geoViewModel = ViewModelProvider.NewInstanceFactory().create(GeoViewModel::class.java)
         geoViewModel.load("140", "40")
         createNotificationChannel()
         setContent {
@@ -41,8 +48,27 @@ class MainActivity : AppCompatActivity() {
             ) {
                 StartButton()
                 HelloScreen(geoViewModel.geo)
+                VisitedList()
             }
         }
+    }
+
+    @Composable
+    fun VisitedList() {
+        val list by geoViewModel.visitedCities.observeAsState()
+
+        list?.forEach { it ->
+            CityCard(it.city)
+        }
+
+    }
+
+    @Composable
+    fun CityCard(message: String) {
+        Text(message)
+        Divider(
+            color = Color.Blue
+        )
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

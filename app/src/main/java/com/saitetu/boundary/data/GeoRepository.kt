@@ -1,5 +1,9 @@
 package com.saitetu.boundary.data
 
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.saitetu.boundary.domain.entity.VisitedCity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -11,6 +15,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 
@@ -23,8 +28,10 @@ interface GeoApiInterface {
     ): Call<GeoResponse>
 }
 
-class GeoRepository {
+class GeoRepository(context: Context) {
     private var retrofit: Retrofit
+    private val visitedCityRepository =
+        VisitedCityRepository(VisitedCityDataBase.getInstance(context).visitedCityDao())
 
     init {
         val moshi = Moshi.Builder()
@@ -55,10 +62,23 @@ class GeoRepository {
         val service = this.retrofit.create(GeoApiInterface::class.java)
         service.getGeoLocationList(METHOD, x, y).enqueue(
             object : Callback<GeoResponse> {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(
                     call: Call<GeoResponse>,
                     response: Response<GeoResponse>
                 ) {
+                    response.body()?.let { geoResponse ->
+                        val visitedCity = geoResponse.response.location[0].let {
+                            VisitedCity(
+                                id = 0,
+                                prefecture = it.prefecture,
+                                city = it.city,
+                                town = it.town,
+                                time = LocalDateTime.now().toString()
+                            )
+                        }
+                        visitedCityRepository.insertVisitedCity(visitedCity)
+                    }
                     response.body()?.response?.location?.get(0)?.let { success(it.city) }
                 }
 
