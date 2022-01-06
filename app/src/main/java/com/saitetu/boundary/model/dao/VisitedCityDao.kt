@@ -1,8 +1,8 @@
-package com.saitetu.boundary.domain.dao
+package com.saitetu.boundary.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.saitetu.boundary.domain.entity.VisitedCity
+import com.saitetu.boundary.model.entity.VisitedCity
 
 @Dao
 interface VisitedCityDao {

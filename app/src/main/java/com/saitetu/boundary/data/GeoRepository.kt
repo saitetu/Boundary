@@ -3,7 +3,7 @@ package com.saitetu.boundary.data
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.saitetu.boundary.domain.entity.VisitedCity
+import com.saitetu.boundary.model.entity.VisitedCity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient

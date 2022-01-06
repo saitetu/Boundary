@@ -1,8 +1,8 @@
 package com.saitetu.boundary.data
 
 import androidx.lifecycle.LiveData
-import com.saitetu.boundary.domain.dao.VisitedCityDao
-import com.saitetu.boundary.domain.entity.VisitedCity
+import com.saitetu.boundary.model.dao.VisitedCityDao
+import com.saitetu.boundary.model.entity.VisitedCity
 
 /**
  * SqLite用repository

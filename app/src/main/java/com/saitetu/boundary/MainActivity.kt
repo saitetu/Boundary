@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             Column(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 StartButton()
                 HelloScreen(geoViewModel.geo)

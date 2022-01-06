@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.saitetu.boundary.domain.dao.VisitedCityDao
-import com.saitetu.boundary.domain.entity.VisitedCity
+import com.saitetu.boundary.model.dao.VisitedCityDao
+import com.saitetu.boundary.model.entity.VisitedCity
 
 @Database(entities = [VisitedCity::class], version = 1, exportSchema = false)
 abstract class VisitedCityDataBase : RoomDatabase() {

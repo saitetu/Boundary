@@ -1,4 +1,4 @@
-package com.saitetu.boundary.domain.entity
+package com.saitetu.boundary.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
