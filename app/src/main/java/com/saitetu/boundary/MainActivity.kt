@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.saitetu.boundary.data.GeoResponse
-import com.saitetu.boundary.data.GeoViewModel
 import com.saitetu.boundary.data.Response
+import com.saitetu.boundary.viewmodel.GeoViewModel
 
 
 class MainActivity : AppCompatActivity() {
