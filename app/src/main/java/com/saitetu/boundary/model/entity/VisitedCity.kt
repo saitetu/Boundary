@@ -10,5 +10,7 @@ data class VisitedCity(
     var prefecture: String,
     var city: String,
     var town: String,
-    var time: String
+    var time: String,
+    var latitude: Double,
+    var longitude: Double
 )

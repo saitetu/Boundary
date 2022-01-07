@@ -92,8 +92,8 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 GpsService.CHANNEL_ID,
-                "お知らせ",
-                NotificationManager.IMPORTANCE_DEFAULT
+                "Boundary",
+                NotificationManager.IMPORTANCE_MIN
             ).apply {
                 description = "お知らせを通知します。"
             }
@@ -117,7 +117,7 @@ fun SwitchWithText(
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "越境監視をONにする",
+            text = "越境監視",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(16.dp),

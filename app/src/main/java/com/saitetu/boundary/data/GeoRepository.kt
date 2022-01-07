@@ -62,9 +62,9 @@ class GeoRepository(context: Context) {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun getLocation(x: String, y: String, success: (city: String) -> Unit) {
+    fun getLocation(longitude: Double, latitude: Double, success: (city: String) -> Unit) {
         val service = this.retrofit.create(GeoApiInterface::class.java)
-        service.getGeoLocationList(METHOD, x, y).enqueue(
+        service.getGeoLocationList(METHOD, longitude.toString(), latitude.toString()).enqueue(
             object : Callback<GeoResponse> {
                 @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(
@@ -78,12 +78,18 @@ class GeoRepository(context: Context) {
                                 prefecture = it.prefecture,
                                 city = it.city,
                                 town = it.town,
-                                time = LocalDateTime.now().toString()
+                                time = LocalDateTime.now().toString(),
+                                latitude = latitude,
+                                longitude = longitude
                             )
                         }
                         GlobalScope.launch {
                             visitedCityRepository.getLatestVisitedCity().let {
-                                if (it.city != visitedCity.city) {
+                                if (it != null) {
+                                    if (it.city != visitedCity.city) {
+                                        visitedCityRepository.insertVisitedCity(visitedCity)
+                                    }
+                                } else {
                                     visitedCityRepository.insertVisitedCity(visitedCity)
                                 }
                             }

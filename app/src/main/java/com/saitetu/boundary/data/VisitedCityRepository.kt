@@ -18,7 +18,7 @@ class VisitedCityRepository(private val dao: VisitedCityDao) {
         return dao.getAll()
     }
 
-    suspend fun getLatestVisitedCity(): VisitedCity {
+    suspend fun getLatestVisitedCity(): VisitedCity? {
         return dao.getLatest()
     }
 }

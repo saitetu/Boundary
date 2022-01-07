@@ -10,7 +10,7 @@ interface VisitedCityDao {
     fun getAll(): LiveData<List<VisitedCity>>
 
     @Query("SELECT * FROM visitedCity ORDER BY id DESC LIMIT 1")
-    suspend fun getLatest(): VisitedCity
+    suspend fun getLatest(): VisitedCity?
 
     @Insert
     fun insert(visitedCity: VisitedCity)

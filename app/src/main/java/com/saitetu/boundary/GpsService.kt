@@ -46,8 +46,8 @@ class GpsService : Service() {
                 for (location in p0.locations) {
                     updatedCount++
                     repository.getLocation(
-                        location.longitude.toString(),
-                        location.latitude.toString()
+                        location.longitude,
+                        location.latitude
                     ) {
                         Log.d(
                             this.javaClass.name,
@@ -64,8 +64,8 @@ class GpsService : Service() {
         }
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("boundary")
-            .setContentText("位置情報を取得しています...")
+            .setContentTitle("Boundary")
+            .setContentText("越境記録中...")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
             .build()
