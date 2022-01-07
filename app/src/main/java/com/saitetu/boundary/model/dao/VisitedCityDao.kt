@@ -6,8 +6,11 @@ import com.saitetu.boundary.model.entity.VisitedCity
 
 @Dao
 interface VisitedCityDao {
-    @Query("SELECT * FROM visitedCity")
+    @Query("SELECT * FROM visitedCity ORDER BY id DESC")
     fun getAll(): LiveData<List<VisitedCity>>
+
+    @Query("SELECT * FROM visitedCity ORDER BY id DESC LIMIT 1")
+    suspend fun getLatest(): VisitedCity
 
     @Insert
     fun insert(visitedCity: VisitedCity)

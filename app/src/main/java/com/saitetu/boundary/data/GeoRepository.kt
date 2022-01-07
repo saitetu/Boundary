@@ -6,6 +6,9 @@ import androidx.annotation.RequiresApi
 import com.saitetu.boundary.model.entity.VisitedCity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -58,6 +61,7 @@ class GeoRepository(context: Context) {
         return null
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun getLocation(x: String, y: String, success: (city: String) -> Unit) {
         val service = this.retrofit.create(GeoApiInterface::class.java)
         service.getGeoLocationList(METHOD, x, y).enqueue(
@@ -77,7 +81,13 @@ class GeoRepository(context: Context) {
                                 time = LocalDateTime.now().toString()
                             )
                         }
-                        visitedCityRepository.insertVisitedCity(visitedCity)
+                        GlobalScope.launch {
+                            visitedCityRepository.getLatestVisitedCity().let {
+                                if (it.city != visitedCity.city) {
+                                    visitedCityRepository.insertVisitedCity(visitedCity)
+                                }
+                            }
+                        }
                     }
                     response.body()?.response?.location?.get(0)?.let { success(it.city) }
                 }

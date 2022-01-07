@@ -17,4 +17,8 @@ class VisitedCityRepository(private val dao: VisitedCityDao) {
     fun getVisitedCityList(): LiveData<List<VisitedCity>> {
         return dao.getAll()
     }
+
+    suspend fun getLatestVisitedCity(): VisitedCity {
+        return dao.getLatest()
+    }
 }

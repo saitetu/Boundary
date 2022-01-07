@@ -4,32 +4,39 @@ import android.Manifest
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.*
 import com.saitetu.boundary.data.GeoRepository
 
 class GpsService : Service() {
-    companion object {
-        const val CHANNEL_ID = "777"
-    }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-    private val repository = GeoRepository(this)
+    private val repository by lazy { GeoRepository(this) }
+
+    //死活監視用
+    private val localBroadcastManager by lazy { LocalBroadcastManager.getInstance(applicationContext) }
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            // no op
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-    }
-
-    private fun locationRequest() {
-
+        // Receiver の登録
+        localBroadcastManager.registerReceiver(broadcastReceiver, IntentFilter(ACTION_IS_RUNNING))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -50,6 +57,7 @@ class GpsService : Service() {
                 }
             }
         }
+
 
         val openIntent = Intent(this, MainActivity::class.java).let {
             PendingIntent.getActivity(this, 0, it, FLAG_IMMUTABLE)
@@ -83,6 +91,7 @@ class GpsService : Service() {
         super.onDestroy()
         stopLocationUpdates()
         stopSelf()
+        localBroadcastManager.unregisterReceiver(broadcastReceiver)
     }
 
     private fun startLocationUpdates() {
@@ -112,10 +121,24 @@ class GpsService : Service() {
 
     private fun createLocationRequest(): LocationRequest {
         return LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 50000
+            fastestInterval = 10000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
+    }
+
+    companion object {
+        private const val ACTION_IS_RUNNING = "com.example.HelloService_is_running"
+
+        fun createIntent(context: Context) = Intent(context, GpsService::class.java)
+
+        fun isRunning(context: Context): Boolean {
+            return LocalBroadcastManager.getInstance(context)
+                .sendBroadcast(Intent(ACTION_IS_RUNNING))
+        }
+
+        const val CHANNEL_ID = "777"
+
     }
 
 }
