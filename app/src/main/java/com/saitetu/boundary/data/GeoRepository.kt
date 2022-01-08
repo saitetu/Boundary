@@ -1,7 +1,14 @@
 package com.saitetu.boundary.data
 
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.saitetu.boundary.model.entity.VisitedCity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -11,6 +18,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 
@@ -23,8 +31,10 @@ interface GeoApiInterface {
     ): Call<GeoResponse>
 }
 
-class GeoRepository {
+class GeoRepository(context: Context) {
     private var retrofit: Retrofit
+    private val visitedCityRepository =
+        VisitedCityRepository(VisitedCityDataBase.getInstance(context).visitedCityDao())
 
     init {
         val moshi = Moshi.Builder()
@@ -51,14 +61,40 @@ class GeoRepository {
         return null
     }
 
-    fun getLocation(x: String, y: String, success: (city: String) -> Unit) {
+    @OptIn(DelicateCoroutinesApi::class)
+    fun getLocation(longitude: Double, latitude: Double, success: (city: String) -> Unit) {
         val service = this.retrofit.create(GeoApiInterface::class.java)
-        service.getGeoLocationList(METHOD, x, y).enqueue(
+        service.getGeoLocationList(METHOD, longitude.toString(), latitude.toString()).enqueue(
             object : Callback<GeoResponse> {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(
                     call: Call<GeoResponse>,
                     response: Response<GeoResponse>
                 ) {
+                    response.body()?.let { geoResponse ->
+                        val visitedCity = geoResponse.response.location[0].let {
+                            VisitedCity(
+                                id = 0,
+                                prefecture = it.prefecture,
+                                city = it.city,
+                                town = it.town,
+                                time = LocalDateTime.now().toString(),
+                                latitude = latitude,
+                                longitude = longitude
+                            )
+                        }
+                        GlobalScope.launch {
+                            visitedCityRepository.getLatestVisitedCity().let {
+                                if (it != null) {
+                                    if (it.city != visitedCity.city) {
+                                        visitedCityRepository.insertVisitedCity(visitedCity)
+                                    }
+                                } else {
+                                    visitedCityRepository.insertVisitedCity(visitedCity)
+                                }
+                            }
+                        }
+                    }
                     response.body()?.response?.location?.get(0)?.let { success(it.city) }
                 }
 
